@@ -23,9 +23,9 @@ rule replaceElsifs
 	by
 		'if IfExpn then
             IfSScope
-        'else 						 %[NL][IN]	
-            'if ElsifExpn then		 %[NL][IN]
-            	ElsifSScope			 %[EX]
+        'else
+            'if ElsifExpn then
+            	ElsifSScope			 
             RmningElsifs
             ElseClause
             'end 'if
