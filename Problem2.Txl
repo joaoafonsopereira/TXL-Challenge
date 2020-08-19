@@ -11,39 +11,22 @@ rule introduceElsifs
 	replace [statement]
 		if IfExpn [expn] then
             IfSScope [sub_scope]
+        Elsifs [repeat elsif_clause]
         else
-            if x = m then
-                put "hi"
-                k := 3
-            else
-                if m > n then
-                    if m = 5 then
-                        x := m * n
-                    else
-                        if y = z then
-                            x := 4
-                        'end if
-                    'end if
-                    put x
-                else
-                    put "that's it"
-                'end if
+            if InnerIfExpn [expn] then
+            	InnerIfSScope [sub_scope]
+            ElseClause [opt else_clause]
             'end if
+            % RestOfScope [statement*]
         'end if
+
+    construct NewElsifClause [elsif_clause]
+    	'elsif InnerIfExpn 'then
+    		InnerIfSScope
 	by
-		if x = y then
-            z :=1
-        elsif x = m then
-            put "hi"
-            k := 3
-        elsif m > n then
-            if m = 5 then
-                x := m * n
-            elsif y = z then
-                x := 4
-            'end if
-            put x
-        else
-            put "that's it"
-        'end if
+		if IfExpn then
+            IfSScope
+        Elsifs [. NewElsifClause]
+    	ElseClause
+    	'end if
 end rule
