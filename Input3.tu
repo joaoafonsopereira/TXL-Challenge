@@ -7,10 +7,10 @@ case x of
         k := 3
     label 4:
         case m of
-	    label 5:
-		x := m * n
-	    label 7:
-		x := 4
+    	    label 5:
+    		  x := m * n
+    	    label 7:
+    		  x := 4
         end case
         put x
     label:
