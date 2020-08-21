@@ -1,11 +1,11 @@
 include "Turing.Grm"
 
+% Grammar overrides to allow construction of if clauses (to increase readability)
 
 define if_clause
 	    'if [expn] 'then          [NL][IN]
 	    	[sub_scope]           [EX]
 end define
-
 
 redefine if_statement
         [if_clause]
@@ -13,6 +13,7 @@ redefine if_statement
         [opt else_clause]
         'end 'if
 end redefine
+
 
 
 function main
@@ -39,16 +40,16 @@ rule replaceCaseStatements
         	SScope
 
     construct Elsifs [repeat elsif_clause]
-    	_ [addElsif Expr each RmningAlts]
+    	_[addElsif Expr each RmningAlts]
 
 	construct Else [opt else_clause]
-    	_ [addOptElse DefaultAlt]
+    	_[addOptElse DefaultAlt]
 
     by 
 		If
 		Elsifs
 		Else
-		'end if
+		'end 'if
 end rule
 
 
