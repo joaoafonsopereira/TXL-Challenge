@@ -32,11 +32,14 @@ rule replaceCaseStatements
         'end case
 
     deconstruct FirstAlt 
-    	'label Alt1 [expn] _ [repeat comma_expn] :
+    	'label Alt1 [expn] Alts1 [repeat comma_expn] :
             SScope [sub_scope]
 
+    construct IfCond [expn]
+    	(Expr) = Alt1
+
     construct If [if_clause]
-    	'if (Expr) = Alt1 'then
+    	'if IfCond[addOrs Expr each Alts1] 'then
         	SScope
 
     construct Elsifs [repeat elsif_clause]
@@ -79,4 +82,15 @@ function addOptElse DefaultAlt [opt last_case_alternative]
     by
     	'else 
     		DefaultSScope
+end function
+
+
+function addOrs Expn [expn] Alt [comma_expn]
+	replace [expn]
+		OldExpn [expn]
+
+	deconstruct Alt
+		', AltExpn [expn]
+	by
+		(OldExpn) 'or ((Expn) = AltExpn)
 end function
