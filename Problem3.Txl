@@ -1,5 +1,20 @@
 include "Turing.Grm"
 
+
+define if_clause
+	    'if [expn] 'then          [NL][IN]
+	    	[sub_scope]           [EX]
+end define
+
+
+redefine if_statement
+        [if_clause]
+        [repeat elsif_clause]
+        [opt else_clause]
+        'end 'if
+end redefine
+
+
 function main
     replace [program]
         P [program]
@@ -19,19 +34,25 @@ rule replaceCaseStatements
     	'label Alt1 [expn] _ [repeat comma_expn] :
             SScope [sub_scope]
 
-    construct Elsifs [repeat elsif_clause]
-    	_ [AddElsif Expr each RmningAlts]
-    	
-    by 
-		'if (Expr) = Alt1 'then
+    construct If [if_clause]
+    	'if (Expr) = Alt1 'then
         	SScope
+
+    construct Elsifs [repeat elsif_clause]
+    	_ [addElsif Expr each RmningAlts]
+
+	construct Else [opt else_clause]
+    	_ [addOptElse DefaultAlt]
+
+    by 
+		If
 		Elsifs
-		% Else
+		Else
 		'end if
 end rule
 
 
-function AddElsif Expn [expn] CaseAlt [case_alternative]
+function addElsif Expn [expn] CaseAlt [case_alternative]
 	replace [repeat elsif_clause]
 		OldElsifs [repeat elsif_clause]
 
@@ -47,10 +68,14 @@ function AddElsif Expn [expn] CaseAlt [case_alternative]
 end function
 
 
+function addOptElse DefaultAlt [opt last_case_alternative]
+	replace [opt else_clause]
+		_ [opt else_clause]
 
-    deconstruct DefaultAlt 
-    	'label :
-            DefaultSScope [sub_scope]
-    construct Else [opt else_clause]
+	deconstruct DefaultAlt 
+		'label :
+	        DefaultSScope [sub_scope]
+    by
     	'else 
     		DefaultSScope
+end function
