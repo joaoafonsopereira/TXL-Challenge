@@ -25,7 +25,7 @@ end function
 
 rule replaceCaseStatements
 	replace [statement]
-		'case Expr [expn] 'of
+		'case Expn [expn] 'of
             FirstAlt [case_alternative]
             RmningAlts [repeat case_alternative]
             DefaultAlt [opt last_case_alternative]
@@ -36,14 +36,14 @@ rule replaceCaseStatements
             SScope [sub_scope]
 
     construct IfCond [expn]
-    	(Expr) = Alt1
+    	(Expn) = Alt1
 
     construct If [if_clause]
-    	'if IfCond[addOrs Expr each Alts1] 'then
+    	'if IfCond[addOrs Expn each Alts1] 'then
         	SScope
 
     construct Elsifs [repeat elsif_clause]
-    	_[addElsif Expr each RmningAlts]
+    	_[addElsif Expn each RmningAlts]
 
 	construct Else [opt else_clause]
     	_[addOptElse DefaultAlt]
@@ -61,11 +61,14 @@ function addElsif Expn [expn] CaseAlt [case_alternative]
 		OldElsifs [repeat elsif_clause]
 
 	deconstruct CaseAlt 
-		'label Alt1 [expn] _ [repeat comma_expn] :
+		'label Alt1 [expn] Alts [repeat comma_expn] :
             SScope [sub_scope]
 
+	construct Condition [expn]
+    	(Expn) = Alt1
+
 	construct NewElsif [elsif_clause]
-		'elsif (Expn) = Alt1 'then
+		'elsif Condition[addOrs Expn each Alts] 'then
 			SScope
 	by
 		OldElsifs [. NewElsif]
@@ -85,11 +88,11 @@ function addOptElse DefaultAlt [opt last_case_alternative]
 end function
 
 
-function addOrs Expn [expn] Alt [comma_expn]
+function addOrs Expn [expn] Alternative [comma_expn]
 	replace [expn]
 		OldExpn [expn]
 
-	deconstruct Alt
+	deconstruct Alternative
 		', AltExpn [expn]
 	by
 		(OldExpn) 'or ((Expn) = AltExpn)
