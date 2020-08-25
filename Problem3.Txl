@@ -30,6 +30,7 @@ redefine expn
 end redefine
 
 
+%%%%%% Transformation rules
 
 function main
     replace [program]

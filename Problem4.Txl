@@ -1,5 +1,6 @@
 include "Turing.Grm"
 
+% Grammar overrides borrowed from last problem's solution
 
 define if_clause
 	    'if [expn] 'then          [NL][IN]
@@ -18,6 +19,8 @@ redefine expn
 	| 	[expn] [op] [expn]
 end redefine
 
+
+%%%%%% Transformation rules
 
 function main
     replace [program]
