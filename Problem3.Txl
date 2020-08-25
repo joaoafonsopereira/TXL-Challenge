@@ -15,6 +15,21 @@ redefine if_statement
 end redefine
 
 
+%( 
+	Allows constructing if conditions ([expn]'s) of the form
+		"Expn = Alt", where Expn is [expn] and Alt is [expn].
+	Without this redefinition, it would be necessary to either:
+	  - write "(Expn) = Alt"   <- (Expn) recognized as [primary] (see primary def.)
+	  - deconstruct Expn into "V[primary] _[opt operator_expn]" and write "V = Alt",
+	  	making the code longer and risking loss of generality 
+	  	(e.g. with "case (x+1) of ...")
+)%
+redefine expn
+		[primary]
+	| 	[expn] [op] [expn]
+end redefine
+
+
 
 function main
     replace [program]
@@ -36,7 +51,7 @@ rule replaceCaseStatements
             SScope [sub_scope]
 
     construct IfCond [expn]
-    	(Expn) = Alt1
+    	Expn = Alt1
 
     construct If [if_clause]
     	'if IfCond[addOrs Expn each Alts1] 'then
@@ -65,7 +80,7 @@ function addElsif Expn [expn] CaseAlt [case_alternative]
             SScope [sub_scope]
 
 	construct Condition [expn]
-    	(Expn) = Alt1
+    	Expn = Alt1
 
 	construct NewElsif [elsif_clause]
 		'elsif Condition[addOrs Expn each Alts] 'then
@@ -95,5 +110,5 @@ function addOrs Expn [expn] Alternative [comma_expn]
 	deconstruct Alternative
 		', AltExpn [expn]
 	by
-		(OldExpn) 'or ((Expn) = AltExpn)
+		OldExpn 'or Expn = AltExpn
 end function
